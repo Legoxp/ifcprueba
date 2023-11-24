@@ -161,6 +161,7 @@ class Authenticate:
 
         Parameters
         ----------
+        
         form_name: str
             The rendered name of the login form.
         location: str
@@ -186,9 +187,9 @@ class Authenticate:
                     login_form = st.sidebar.form('Login')
 
                 login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
+                self.username = login_form.text_input('Usuario').lower()
                 st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
+                self.password = login_form.text_input('Contraseña', type='password')
 
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()

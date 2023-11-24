@@ -9,7 +9,7 @@ import database as db
 
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
-st.set_page_config(page_title="streamlit Dashboard", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(page_title="IfcStudio", page_icon=":bar_chart:", layout="wide")
 
 hide_bar= """
     <style>
@@ -33,28 +33,28 @@ hashed_passwords = [user["password"] for user in users]
 authenticator = stauth.Authenticate(names, usernames, hashed_passwords,
     "SIPL_dashboard", "abcdef")
 
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Acceso", "main")
 
 if authentication_status == False:
-    st.error("Username/password is incorrect")
+    st.error("usuario/contraseña es incorrecta")
     st.markdown(hide_bar, unsafe_allow_html=True)
 
 if authentication_status == None:
-    st.warning("Please enter your username and password")
+    st.warning("Por favor ingresar su usuario y contraseña")
     st.markdown(hide_bar, unsafe_allow_html=True)
 
 
 if authentication_status:
     # # ---- SIDEBAR ----
-    st.sidebar.title(f"Welcome {name}")
+    st.sidebar.title(f"Bienvenido {name}")
     # st.sidebar.header("select page here :")
-    st.write("# Welcome to Streamlit!..")
+    st.write("# Bienvenido a IfcStudio")
 
     ###about ....
     st.subheader("Introduction :")
     st.text("1. \n2. \n3. \n4. \n5. \n")
 
-    st.sidebar.success("Select a page above.")
+    st.sidebar.success("Seleccione una herramienta ")
 
     ###---- HIDE STREAMLIT STYLE ----
     hide_st_style = """
