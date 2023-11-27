@@ -4,8 +4,9 @@ import pandas as pd  # pip install pandas openpyxl
 import plotly.express as px  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 import streamlit_authenticator as stauth  # pip install streamlit-authenticator
-
 import database as db
+from streamlit__authenticator.authenticate import Authenticate
+
 
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
@@ -42,7 +43,19 @@ if authentication_status == False:
 if authentication_status == None:
     st.warning("Por favor ingresar su usuario y contraseña")
     st.markdown(hide_bar, unsafe_allow_html=True)
-
+    
+if st.session_state["authentication_status"]:
+    try:
+        if authenticator.reset_password(st.session_state["username"], 'Reset password'):
+            st.success('Password modified successfully')
+    except Exception as e:
+        st.error(e)
+##registros
+try:
+    if Authenticate.register_user("registro","main", preauthorization=False):
+        st.success('User registered successfully')
+except Exception as e:
+    st.error(e)
 
 if authentication_status:
     # # ---- SIDEBAR ----

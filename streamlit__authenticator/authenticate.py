@@ -4,17 +4,17 @@ import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
 
-import hasher
-import validator
-import utils 
-import exceptions 
+from streamlit__authenticator.hasher import Hasher
+from .validator import Validator
+from .utils import generate_random_pw
+from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
     forgot username, and modify user details widgets.
     """
     def __init__(self, credentials: dict, cookie_name: str, key: str, cookie_expiry_days: float=30.0, 
-        preauthorized: list=None, validator: validator.Validator=None):
+        preauthorized: list=None, validator: Validator=None):
         """
         Create a new instance of "Authenticate".
 
@@ -235,7 +235,7 @@ class Authenticate:
         password: str
             The updated plain text password.
         """
-        self.credentials['usernames'][username]['password'] = hasher.Hasher([password]).generate()[0]
+        self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
 
     def reset_password(self, username: str, form_name: str, location: str='main') -> bool:
         """
@@ -275,13 +275,13 @@ class Authenticate:
                             self._update_password(self.username, new_password)
                             return True
                         else:
-                            raise exceptions.ResetError('New and current passwords are the same')
+                            raise ResetError('New and current passwords are the same')
                     else:
-                        raise exceptions.ResetError('Passwords do not match')
+                        raise ResetError('Passwords do not match')
                 else:
-                    raise exceptions.ResetError('No new password provided')
+                    raise ResetError('No new password provided')
             else:
-                raise exceptions.CredentialsError('password')
+                raise CredentialsError('password')
     
     def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
         """
@@ -302,14 +302,14 @@ class Authenticate:
             False: any user can register.
         """
         if not self.validator.validate_username(username):
-            raise exceptions.RegisterError('Username is not valid')
+            raise RegisterError('Username is not valid')
         if not self.validator.validate_name(name):
-            raise exceptions.RegisterError('Name is not valid')
+            raise RegisterError('Name is not valid')
         if not self.validator.validate_email(email):
-            raise exceptions.RegisterError('Email is not valid')
+            raise RegisterError('Email is not valid')
 
         self.credentials['usernames'][username] = {'name': name, 
-            'password': hasher.Hasher([password]).generate()[0], 'email': email}
+            'password': Hasher([password]).generate()[0], 'email': email}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
@@ -357,16 +357,16 @@ class Authenticate:
                                 self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                                 return True
                             else:
-                                raise exceptions.RegisterError('User not preauthorized to register')
+                                raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
                             return True
                     else:
-                        raise exceptions.RegisterError('Passwords do not match')
+                        raise RegisterError('Passwords do not match')
                 else:
-                    raise exceptions.RegisterError('Username already taken')
+                    raise RegisterError('Username already taken')
             else:
-                raise exceptions.RegisterError('Please enter an email, username, name, and password')
+                raise RegisterError('Please enter an email, username, name, and password')
 
     def _set_random_password(self, username: str) -> str:
         """
@@ -381,8 +381,8 @@ class Authenticate:
         str
             New plain text password that should be transferred to user securely.
         """
-        self.random_password = utils.generate_random_pw()
-        self.credentials['usernames'][username]['password'] = hasher.Hasher([self.random_password]).generate()[0]
+        self.random_password = generate_random_pw()
+        self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
     def forgot_password(self, form_name: str, location: str='main') -> tuple:
@@ -421,7 +421,7 @@ class Authenticate:
                 else:
                     return False, None, None
             else:
-                raise exceptions.ForgotError('Username not provided')
+                raise ForgotError('Username not provided')
         return None, None, None
 
     def _get_username(self, key: str, value: str) -> str:
@@ -475,7 +475,7 @@ class Authenticate:
             if len(email) > 0:
                 return self._get_username('email', email), email
             else:
-                raise exceptions.ForgotError('Email not provided')
+                raise ForgotError('Email not provided')
         return None, email
 
     def _update_entry(self, username: str, key: str, value: str):
@@ -534,6 +534,6 @@ class Authenticate:
                             expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                     return True
                 else:
-                    raise exceptions.UpdateError('New and current values are the same')
+                    raise UpdateError('New and current values are the same')
             if len(new_value) == 0:
-                raise exceptions.UpdateError('New value not provided')
+                raise UpdateError('New value not provided')
