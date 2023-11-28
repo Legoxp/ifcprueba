@@ -4,9 +4,9 @@ import pandas as pd  # pip install pandas openpyxl
 import plotly.express as px  # pip install plotly-express
 import streamlit as st  # pip install streamlit
 import streamlit_authenticator as stauth  # pip install streamlit-authenticator
-import database as db
-from streamlit__authenticator.authenticate import Authenticate
 
+from streamlit__authenticator.authenticate import Authenticate
+from database import  databases 
 
 
 # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
@@ -24,42 +24,43 @@ hide_bar= """
     </style>
 """
 
-# --- USER AUTHENTICATION ---
-users = db.fetch_all_users()
 
-usernames = [user["key"] for user in users]
-names = [user["name"] for user in users]
-hashed_passwords = [user["password"] for user in users]
 
-authenticator = stauth.Authenticate(names, usernames, hashed_passwords,
-    "SIPL_dashboard", "abcdef")
+users = databases.fetch_users()
+emails = []
+usernames = []
+passwords = []
 
-name, authentication_status, username = authenticator.login("Acceso", "main")
+for user in users:
+    emails.append(user['key'])
+    usernames.append(user['username'])
+    passwords.append(user['password'])
+
+credentials = {'usernames': {}}
+for index in range(len(emails)):
+    credentials['usernames'][usernames[index]] = {'name': emails[index], 'password': passwords[index]}
+
+Authenticator = stauth.Authenticate(credentials, cookie_name='Streamlit', key='abcdef', cookie_expiry_days=4)
+
+email, authentication_status, username = Authenticator.login('Login', 'main')
 
 if authentication_status == False:
-    st.error("usuario/contraseña es incorrecta")
+    st.error("Username/password is incorrect")
     st.markdown(hide_bar, unsafe_allow_html=True)
 
 if authentication_status == None:
-    st.warning("Por favor ingresar su usuario y contraseña")
+    st.warning("Please enter your username and password")
     st.markdown(hide_bar, unsafe_allow_html=True)
-    
-if st.session_state["authentication_status"]:
-    try:
-        if authenticator.reset_password(st.session_state["username"], 'Reset password'):
-            st.success('Password modified successfully')
-    except Exception as e:
-        st.error(e)
-##registros
-try:
-    if Authenticate.register_user("registro","main", preauthorization=False):
-        st.success('User registered successfully')
-except Exception as e:
-    st.error(e)
+
+info, info1 = st.columns(2)
+
+if not authentication_status:
+    databases.sign_up()
+
 
 if authentication_status:
     # # ---- SIDEBAR ----
-    st.sidebar.title(f"Bienvenido {name}")
+    st.sidebar.title(f"Bienvenido {usernames}")
     # st.sidebar.header("select page here :")
     st.write("# Bienvenido a IfcStudio")
 
@@ -80,6 +81,6 @@ if authentication_status:
     st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
-    authenticator.logout("Logout", "sidebar")
+    Authenticator.logout("Logout", "sidebar")
 
     

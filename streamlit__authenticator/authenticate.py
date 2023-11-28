@@ -3,11 +3,12 @@ import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
-
-from streamlit__authenticator.hasher import Hasher
+import streamlit_authenticator as stauth
+from .hasher import Hasher
 from .validator import Validator
 from .utils import generate_random_pw
 from .exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
+
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -368,6 +369,8 @@ class Authenticate:
             else:
                 raise RegisterError('Please enter an email, username, name, and password')
 
+    
+
     def _set_random_password(self, username: str) -> str:
         """
         Updates credentials dictionary with user's hashed random password.
@@ -537,3 +540,4 @@ class Authenticate:
                     raise UpdateError('New and current values are the same')
             if len(new_value) == 0:
                 raise UpdateError('New value not provided')
+           
