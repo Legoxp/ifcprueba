@@ -18,6 +18,18 @@ st.set_page_config(page_title="Revisor de Modelos IFC", page_icon="📈")
 
 st.title("Revisor de Modelos IFC")
 
+###---- HIDE STREAMLIT STYLE ----
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+base="light"
+
+
 def cargar_datos_desde_json(tipo_modelo, nivel_avance):
     # Genera la ruta completa del archivo JSON basado en la selección del usuario
     nombre_archivo = f"{tipo_modelo}_{nivel_avance}.json"

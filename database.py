@@ -86,7 +86,7 @@ class databases :
         return db.delete(username)
 
 
-    def insert_user(email, username, password):
+    def insert_user(email, username, password,nameuser,empresa,cargo,rolbim,tipoprotecto,areaempresa):
         """
         Inserts Users into the DB
         :param email:
@@ -94,9 +94,9 @@ class databases :
         :param password:
         :return User Upon successful Creation:
         """
-        date_joined = str(datetime.datetime.now())
+        date_joined = str(datetime.now())
 
-        return db.put({'key': email, 'username': username, 'password': password, 'date_joined': date_joined})
+        return db.put({'key': email, 'username': username, 'password': password, 'nameuser':nameuser,'empresa':empresa,'cargo':cargo, 'rolbim':rolbim , 'tipoprotecto':tipoprotecto , 'areaempresa':areaempresa ,'date_joined': date_joined})
 
 
     def fetch_users():
@@ -138,7 +138,7 @@ class databases :
         :param email:
         :return True if email is valid else False:
         """
-        pattern = "^[a-zA-Z0-9-_]+@[a-zA-Z0-9]+\.[a-z]{1,3}$" #tesQQ12@gmail.com
+        pattern = "^[a-zA-Z0-9-.-_]+@[a-zA-Z0-9]+\.[a-z]{1,3}$" #tesQQ12@gmail.com
 
         if re.match(pattern, email):
             return True
@@ -168,6 +168,8 @@ class databases :
             location: str
                 The location of the logout button i.e. main or sidebar.
             """
+            
+
             if location not in ['main', 'sidebar']:
                 raise ValueError("Location must be one of 'main' or 'sidebar'")
             if location == 'main':
@@ -187,11 +189,17 @@ class databases :
 
     def sign_up():
         with st.form(key='signup', clear_on_submit=True):
-            st.subheader(':green[Sign Up]')
-            email = st.text_input(':blue[Email]', placeholder='Enter Your Email')
-            username = st.text_input(':blue[Username]', placeholder='Enter Your Username')
-            password1 = st.text_input(':blue[Password]', placeholder='Enter Your Password', type='password')
-            password2 = st.text_input(':blue[Confirm Password]', placeholder='Confirm Your Password', type='password')
+            st.subheader('Registro')
+            email = st.text_input('Email', placeholder='Ingresa tu correo')
+            username = st.text_input('Nombre de usuario', placeholder='Ingresa tu Nombre de usuario ')
+            nameuser = st.text_input('Nombre completo', placeholder='Ingresa tu nombre ')
+            empresa = st.text_input('Empresa ', placeholder='Ingresa el nombre de la empresa donde trabajas')
+            cargo = st.text_input('Cargo ', placeholder='Ingresa tu cargo en la empresa')
+            rolbim = st.text_input('Rol Bim ', placeholder='Ingresa tu Rol Bim')
+            tipoprotecto = st.text_input('Tipo de proyecyo', placeholder='Ingresa el tipo de proyecto en el que te encuentras')
+            areaempresa = st.text_input('Area de trabajo ', placeholder='Ingresa tu area en la que trabajas')
+            password1 = st.text_input('Contraseña', placeholder='Ingresa tu contraseña ', type='password')
+            password2 = st.text_input('Confirmar contraseña', placeholder='Confirma tu contraseña', type='password')
 
             if email:
                 if databases.validate_email(email):
@@ -203,26 +211,25 @@ class databases :
                                         if password1 == password2:
                                             # Add User to DB
                                             hashed_password = stauth.Hasher([password2]).generate()
-                                            databases.insert_user(email, username, hashed_password[0])
-                                            st.success('Account created successfully!!')
-                                            st.balloons()
+                                            databases.insert_user(email, username, hashed_password[0],nameuser,empresa,cargo,rolbim,tipoprotecto,areaempresa)
+                                            st.success('Cuentra creada  created satisfactoriamente!!')
                                         else:
-                                            st.warning('Passwords Do Not Match')
+                                            st.warning('Contraseñas no coincide')
                                     else:
-                                        st.warning('Password is too Short')
+                                        st.warning('Contraseña demaciada corta')
                                 else:
-                                    st.warning('Username Too short')
+                                    st.warning('Usuairo demaciado corto')
                             else:
-                                st.warning('Username Already Exists')
+                                st.warning('Usuario existente')
 
                         else:
-                            st.warning('Invalid Username')
+                            st.warning('Usuario invalido')
                     else:
-                        st.warning('Email Already exists!!')
+                        st.warning('El correo ya esta en uso!!')
                 else:
-                    st.warning('Invalid Email')
+                    st.warning('Correo invalido')
 
             btn1, bt2, btn3, btn4, btn5 = st.columns(5)
 
             with btn3:
-                st.form_submit_button('Sign Up')
+                st.form_submit_button('Registro')
